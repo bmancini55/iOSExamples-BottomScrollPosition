@@ -47,6 +47,14 @@
                                                object:nil];
 }
 
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    
+    // Remove notification for keyboard change events
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
     // Populate the temporary data used for this example
@@ -55,14 +63,6 @@
     
     // Scroll to the bottom with our Category helper
     [self.tableView scrollToBottom:false];
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
-    
-    // Remove notification for keyboard change events
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
 }
 
 
@@ -102,16 +102,22 @@
 
 #pragma Handle keyboard events
 
-// Scrolls the table by an appropriate amount
+// This will be called each time there is a frame change for the keyboad
+// We can use the begin/end values to determine how the keyboard is going to change
+// and apply appropriate scrolling to our table
 -(void)keyboardWillChange:(NSNotification *)notification
 {
+    // Retrieve the keyboard begin / end frame values
     CGRect beginFrame = [[notification.userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
     CGRect endFrame =  [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGFloat delta = (endFrame.origin.y - beginFrame.origin.y);
     NSLog(@"Keyboard YDelta %f -> B: %@, E: %@", delta, NSStringFromCGRect(beginFrame), NSStringFromCGRect(endFrame));
     
+    // Lets only maintain the scroll position if we are already scrolled at the bottom
+    // or if there is a change to the keyboard position
     if(self.tableView.scrolledToBottom && fabs(delta) > 0.0) {
         
+        // Construct the animation details
         NSTimeInterval duration = [[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
         UIViewAnimationCurve curve = [[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue];
         UIViewAnimationOptions options = (curve << 16) | UIViewAnimationOptionBeginFromCurrentState;

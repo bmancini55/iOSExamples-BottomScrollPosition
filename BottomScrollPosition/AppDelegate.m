@@ -17,8 +17,8 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-
-    TableViewController *tableViewController = [[TableViewController alloc] initWithStyle:UITableViewStylePlain];
+    
+    TableViewController *tableViewController = [[TableViewController alloc] init];
     UINavigationController *navConroller = [[UINavigationController alloc]initWithRootViewController:tableViewController];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
